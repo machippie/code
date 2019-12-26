@@ -36,6 +36,8 @@
 
     - name: Check program running
       register: code_running
+      failed_when: False
+      changed_when: code_running.stdout | length > 0 | bool
       command: pidof Visual\ Studio\ Code
       tags:
         - code
