@@ -1,0 +1,16 @@
+# Standards: 0.1
+---
+- name: Kill sublime-text
+  command: killall Visual\ Studio\ Code
+  register: code_kill
+  failed_when: code_kill.rc != 0 and "No matching processes belonging to you were found" not in code_kill.stderr
+  become: "{{ (code_user != ansible_user_id) | bool }}"
+  become_user: "{{ code_user }}"
+
+- name: Start sublime-text
+  when: code_started
+  command: open -j /Applications/Visual\ Studio\ Code.app
+  become: "{{ (code_user != ansible_user_id) | bool }}"
+  become_user: "{{ code_user }}"
+
+...

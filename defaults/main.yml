@@ -1,0 +1,10 @@
+# Standards: 0.1
+---
+# @var code_user:description: User to run user-specific commands
+# @var code_user:value: code_user | default(homebrew_user) | default(ansible_user_id)
+# code_user:
+
+# @var code_started:description: Restart app if already running
+code_started: True
+
+...

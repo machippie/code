@@ -1,0 +1,52 @@
+# Standards: 0.1
+---
+- name: Fact code user
+  set_fact:
+    code_user: "{{ code_user | default(homebrew_user) | default(ansible_user_id) }}"
+  tags:
+    - code
+
+- become: "{{ (code_user != ansible_user_id) | bool }}"
+  become_user: "{{ code_user }}"
+  block:
+    - name: Install required package
+      ignore_errors: True
+      homebrew_cask:
+        name: visual-studio-code
+        greedy: True
+        options: appdir=/Applications
+        accept_external_apps: False
+        state: upgraded
+      tags:
+        - code
+
+    - name: Remove quarantine flag
+      register: code_quarantine
+      failed_when: code_quarantine.rc != 0 and "No such xattr" not in code_quarantine.stderr
+      changed_when: code_quarantine.rc == 0
+      command: xattr -d com.apple.quarantine /Applications/Visual\ Studio\ Code.app
+      tags:
+        - code
+
+    - name: Install pidof package
+      homebrew:
+        name: pidof
+      tags:
+        - code
+
+    - name: Check program running
+      register: code_running
+      check_mode: False
+      failed_when: False
+      changed_when: code_running.stdout | length > 0 | bool
+      command: pidof Visual\ Studio\ Code
+      tags:
+        - code
+
+    - name: Fact program running
+      set_fact:
+        code_started: "{{ code_running.stdout_lines | length > 0 | bool }}"
+      tags:
+        - code
+
+...
