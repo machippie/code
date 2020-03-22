@@ -20,33 +20,12 @@
       tags:
         - code
 
-    - name: Remove quarantine flag
-      register: code_quarantine
-      failed_when: code_quarantine.rc != 0 and "No such xattr" not in code_quarantine.stderr
-      changed_when: code_quarantine.rc == 0
-      command: xattr -d com.apple.quarantine /Applications/Visual\ Studio\ Code.app
-      tags:
-        - code
-
-    - name: Install pidof package
-      homebrew:
-        name: pidof
-      tags:
-        - code
-
-    - name: Check program running
-      register: code_running
-      check_mode: False
-      failed_when: False
-      changed_when: code_running.stdout | length > 0 | bool
-      command: pidof Visual\ Studio\ Code
-      tags:
-        - code
-
-    - name: Fact program running
-      set_fact:
-        code_started: "{{ code_running.stdout_lines | length > 0 | bool }}"
-      tags:
-        - code
+- name: Remove quarantine flag
+  register: code_quarantine
+  failed_when: code_quarantine.rc != 0 and "No such xattr" not in code_quarantine.stderr
+  changed_when: code_quarantine.rc == 0
+  command: xattr -d com.apple.quarantine /Applications/Visual\ Studio\ Code.app
+  tags:
+    - code
 
 ...
